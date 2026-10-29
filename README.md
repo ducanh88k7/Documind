@@ -1,0 +1,151 @@
+# DocuMind — Milestone 1, 2 và 3
+
+DocuMind là dự án học tập chạy cục bộ để đọc hiểu ảnh **hóa đơn** và **phiếu nhập kho** bằng Computer Vision (CV) và NLP. Phiên bản này hoàn tất bộ khung dữ liệu ban đầu và bổ sung baseline OCR tiếng Việt; chưa có bộ trích xuất trường bằng NLP.
+
+## Trạng thái hiện tại
+
+- **Milestone 1:** xác định phạm vi, người dùng, dữ liệu đầu vào/đầu ra và tiêu chí nghiệm thu.
+- **Milestone 2:** cấu trúc dự án, JSON Schema, hai tài liệu giả lập và kiểm tra nhãn.
+- **Milestone 3:** tiền xử lý ảnh, OCR bằng Tesseract, lưu văn bản/hộp giới hạn, đo CER/WER.
+- **Chưa triển khai:** trích xuất trường bằng NLP, mô hình phân loại tài liệu, UI, API hoặc hệ thống kế toán.
+
+## 1. Cài đặt trên Windows bằng PyCharm
+
+Mở thư mục `DocuMind_M1_M2` trong PyCharm rồi mở Terminal tại thư mục gốc.
+
+### 1.1. Kiểm tra và chọn Python
+
+```powershell
+py -0p
+```
+
+Dự án hỗ trợ Python `>=3.10,<3.14`. Dùng một phiên bản có sẵn trên máy, ví dụ Python 3.10:
+
+```powershell
+py -3.10 -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip
+python -m pip install -e ".[dev,ocr]"
+```
+
+Nếu máy bạn dùng Python 3.11, thay `py -3.10` bằng `py -3.11`. Trong PyCharm, chọn interpreter tại `.venv\Scripts\python.exe`.
+
+### 1.2. Cài chương trình Tesseract OCR
+
+`pytesseract` là lớp kết nối Python; nó **không** tự cài chương trình Tesseract. Cần cài Tesseract OCR cho Windows và có dữ liệu ngôn ngữ `vie` (tiếng Việt) cùng `eng` (tiếng Anh/số/mã).
+
+- Hướng dẫn cài Tesseract: <https://github.com/tesseract-ocr/tessdoc/blob/main/Installation.md>
+- Bộ dữ liệu ngôn ngữ chính thức: <https://github.com/tesseract-ocr/tessdata>
+- Trang hướng dẫn tiếng Việt trong tài liệu dự án: xem đường dẫn cài đặt Windows ở tài liệu Tesseract; sau cài đặt, kiểm tra thư mục `tessdata` có `vie.traineddata` và `eng.traineddata`.
+
+Nếu `tesseract.exe` không được thêm vào PATH, ghi đường dẫn của nó khi chạy script bằng `--tesseract-path`, ví dụ:
+
+```powershell
+python scripts/check_ocr_environment.py --tesseract-path "C:\Program Files\Tesseract-OCR\tesseract.exe"
+```
+
+Không cần GPU hoặc API trả phí. Lần đầu cài phụ thuộc Python cần Internet; sau khi các gói và dữ liệu ngôn ngữ đã có trên máy, OCR chạy cục bộ.
+
+### 1.3. Kiểm tra Milestone 1/2 và OCR
+
+```powershell
+python scripts/check_environment.py
+python -m pytest
+python scripts/check_ocr_environment.py
+```
+
+Nếu Tesseract chưa nằm trong PATH, truyền thêm `--tesseract-path` như ví dụ trên.
+
+## 2. Chạy OCR trên tài liệu mẫu
+
+Chạy riêng một chế độ tiền xử lý trên hóa đơn:
+
+```powershell
+python scripts/run_ocr.py --image data/raw/synthetic/sample_invoice_001.png --mode original
+```
+
+Chạy đủ năm biến thể để so sánh trên hóa đơn:
+
+```powershell
+python scripts/run_ocr.py --image data/raw/synthetic/sample_invoice_001.png --all-modes
+```
+
+Làm tương tự với phiếu nhập kho:
+
+```powershell
+python scripts/run_ocr.py --image data/raw/synthetic/sample_stock_in_slip_001.png --all-modes
+```
+
+Nếu Tesseract chưa ở PATH:
+
+```powershell
+python scripts/run_ocr.py --image data/raw/synthetic/sample_invoice_001.png --all-modes --tesseract-path "C:\Program Files\Tesseract-OCR\tesseract.exe"
+```
+
+Các chế độ hiện có:
+
+| Chế độ | Ý nghĩa | Trường hợp đáng thử |
+|---|---|---|
+| `original` | Giữ nguyên ảnh màu | Mốc baseline |
+| `grayscale` | Chuyển thành ảnh xám | Giảm thông tin màu không cần thiết |
+| `otsu` | Nhị phân hóa tự động | Ảnh có nền tương đối đồng đều |
+| `adaptive` | Ngưỡng cục bộ thích nghi | Ảnh có vùng sáng tối khác nhau |
+| `clahe` | Tăng tương phản cục bộ | Chữ mờ/độ tương phản thấp; có thể làm nhiễu tăng |
+
+Không có chế độ nào luôn tốt nhất. So sánh kết quả trên cùng ảnh và cùng cấu hình OCR, rồi mới chọn cấu hình phù hợp.
+
+## 3. Đầu ra nằm ở đâu?
+
+- `data/processed/preprocessed/`: ảnh sau tiền xử lý.
+- `data/processed/ocr/*.json`: văn bản, confidence, tọa độ bbox, cấu hình và thời gian xử lý.
+- `data/processed/ocr/*.txt`: văn bản OCR thuần.
+- `data/processed/visualizations/`: ảnh gốc có vẽ khung quanh dòng chữ được nhận diện.
+- `data/processed/ocr/evaluation.csv`: bảng so sánh CER/WER sau bước đánh giá.
+
+Tọa độ `bbox` theo định dạng `[x, y, width, height]`, tính bằng pixel. Các biến thể tiền xử lý không thay đổi kích thước ảnh, do đó bbox vẫn dùng cùng hệ tọa độ với ảnh gốc.
+
+## 4. Đánh giá CER/WER
+
+Sau khi chạy OCR cho cả hai ảnh, chạy:
+
+```powershell
+python scripts/evaluate_ocr.py
+```
+
+- **CER (Character Error Rate):** số thao tác sửa ký tự tối thiểu chia số ký tự trong văn bản tham chiếu.
+- **WER (Word Error Rate):** số thao tác sửa từ tối thiểu chia số từ trong văn bản tham chiếu.
+- CER/WER càng thấp càng tốt. Chương trình chuẩn hóa Unicode NFC, không phân biệt chữ hoa/thường và gộp nhiều khoảng trắng; **không xóa dấu tiếng Việt**.
+
+Bộ dữ liệu hiện tại chỉ có hai ảnh giả lập, nên kết quả chỉ dùng để xác minh pipeline và học phân tích lỗi. Không dùng nó để tuyên bố chất lượng OCR tổng quát.
+
+## 5. Cấu trúc tệp quan trọng
+
+```text
+src/documind/cv/preprocessing.py   # Đọc/lưu ảnh và năm chế độ tiền xử lý
+src/documind/cv/ocr_engine.py      # Gọi Tesseract và gom từ thành dòng
+src/documind/cv/pipeline.py        # Điều phối OCR, lưu JSON/TXT và ảnh bbox
+src/documind/evaluation/ocr_metrics.py  # Chuẩn hóa văn bản, edit distance, CER, WER
+scripts/check_ocr_environment.py   # Kiểm tra Tesseract và các gói ngôn ngữ
+scripts/run_ocr.py                # Giao diện dòng lệnh để chạy OCR
+scripts/evaluate_ocr.py           # Đánh giá kết quả OCR
+schemas/document_annotation.schema.json # Hợp đồng dữ liệu gán nhãn
+```
+
+## 6. Quy tắc dữ liệu và bảo mật
+
+- Ảnh có sẵn là dữ liệu giả lập, không phải chứng từ thật.
+- Không đưa hóa đơn riêng tư, mã số thuế thật, thông tin khách hàng hoặc dữ liệu cá nhân lên Git.
+- Kiểm tra giấy phép/điều khoản của dữ liệu công khai trước khi tải về hoặc sử dụng.
+- Tách biệt tập train/validation/test; không dùng tập test để liên tục chỉnh cấu hình.
+- Không coi confidence OCR là xác suất đúng đã được hiệu chuẩn.
+- Chưa tự động chấp nhận thông tin tài chính: các trường sẽ cần được người dùng xác nhận ở milestone sau.
+
+## 7. Tiêu chí nghiệm thu Milestone 3
+
+- [ ] `python scripts/check_ocr_environment.py` tìm thấy Tesseract và hai gói `vie`, `eng`.
+- [ ] Có thể chạy OCR cho cả hóa đơn và phiếu nhập kho bằng CPU.
+- [ ] Mỗi lần chạy tạo JSON, TXT và ảnh bbox nếu không tắt visualization.
+- [ ] Chạy được năm chế độ tiền xử lý mà không đổi kích thước ảnh.
+- [ ] `python scripts/evaluate_ocr.py` sinh CSV có CER/WER cho các kết quả hợp lệ.
+- [ ] Đã xem ảnh bbox, đọc lại TXT/JSON và ghi nhận ít nhất ba lỗi OCR quan sát được.
+- [ ] Chưa bắt đầu Milestone 4 (NLP) trước khi xác nhận kết quả ở milestone này.

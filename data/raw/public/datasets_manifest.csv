@@ -1,0 +1,4 @@
+﻿dataset_id,name,upstream_url,language,document_types,planned_use,license_or_terms_status,downloaded,notes
+sroie,ICDAR2019 SROIE,https://github.com/jsdnrs/ICDAR2019-SROIE,English,receipts,Auxiliary OCR and key-information extraction benchmark,VERIFY exact upstream terms and mirror rights before download,no,Not representative of Vietnamese invoices/stock-in slips; report metrics separately.
+cord,CORD (Consolidated Receipt Dataset),https://github.com/clovaai/cord,Primarily Korean,receipts with line items,Auxiliary post-OCR parsing and line-item experiments,VERIFY dataset-specific terms before download,no,Language/layout domain differs from target data; do not mix benchmark scores.
+mc-ocr-vn,RIVF2021 MC-OCR,https://www.rivf2021-mc-ocr.vietnlp.com/dataset,Vietnamese,receipts,Optional Vietnamese OCR validation set,Research use; site states a signed user agreement and registration are required,no,Do not download/use until access conditions are satisfied.

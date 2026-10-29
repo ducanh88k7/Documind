@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "documind"
+version = "0.2.0"
+description = "Du an hoc Computer Vision va NLP de doc hieu hoa don va phieu nhap kho"
+readme = "README.md"
+requires-python = ">=3.10,<3.14"
+dependencies = [
+  "Pillow>=10.0,<13.0",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.0,<10.0",
+  "jsonschema>=4.21,<5.0",
+]
+ocr = [
+  "pytesseract>=0.3.13,<0.4.0",
+  "opencv-python-headless>=4.9,<5.0",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+addopts = "-q"

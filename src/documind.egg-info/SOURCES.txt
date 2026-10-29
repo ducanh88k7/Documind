@@ -1,0 +1,17 @@
+README.md
+pyproject.toml
+src/documind/__init__.py
+src/documind.egg-info/PKG-INFO
+src/documind.egg-info/SOURCES.txt
+src/documind.egg-info/dependency_links.txt
+src/documind.egg-info/requires.txt
+src/documind.egg-info/top_level.txt
+src/documind/cv/__init__.py
+src/documind/cv/ocr_engine.py
+src/documind/cv/pipeline.py
+src/documind/cv/preprocessing.py
+src/documind/evaluation/__init__.py
+src/documind/evaluation/ocr_metrics.py
+tests/test_annotation_schema.py
+tests/test_ocr_metrics.py
+tests/test_preprocessing.py

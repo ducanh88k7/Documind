@@ -1,0 +1,299 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://documind.local/schemas/document_annotation.schema.json",
+  "title": "DocuMind Document Annotation",
+  "description": "Canonical ground-truth record for Vietnamese invoices and stock-in slips.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "document_id",
+    "document_type",
+    "document_number",
+    "document_date",
+    "supplier",
+    "counterparty",
+    "items",
+    "totals",
+    "source",
+    "text_regions"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "document_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "document_type": {
+      "type": "string",
+      "enum": [
+        "invoice",
+        "stock_in_slip"
+      ]
+    },
+    "document_number": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "document_date": {
+      "oneOf": [
+        {
+          "type": "string",
+          "format": "date"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "supplier": {
+      "$ref": "#/$defs/party"
+    },
+    "counterparty": {
+      "$ref": "#/$defs/counterparty"
+    },
+    "items": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/item"
+      }
+    },
+    "totals": {
+      "$ref": "#/$defs/totals"
+    },
+    "source": {
+      "$ref": "#/$defs/source"
+    },
+    "text_regions": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/text_region"
+      }
+    }
+  },
+  "$defs": {
+    "nullable_string": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "nullable_number": {
+      "type": [
+        "number",
+        "null"
+      ]
+    },
+    "party": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "tax_id",
+        "address"
+      ],
+      "properties": {
+        "name": {
+          "$ref": "#/$defs/nullable_string"
+        },
+        "tax_id": {
+          "$ref": "#/$defs/nullable_string"
+        },
+        "address": {
+          "$ref": "#/$defs/nullable_string"
+        }
+      }
+    },
+    "counterparty": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "role",
+        "name",
+        "tax_id",
+        "address"
+      ],
+      "properties": {
+        "role": {
+          "type": "string",
+          "enum": [
+            "buyer",
+            "warehouse_receiver",
+            "unknown"
+          ]
+        },
+        "name": {
+          "$ref": "#/$defs/nullable_string"
+        },
+        "tax_id": {
+          "$ref": "#/$defs/nullable_string"
+        },
+        "address": {
+          "$ref": "#/$defs/nullable_string"
+        }
+      }
+    },
+    "item": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "line_number",
+        "item_code",
+        "description",
+        "quantity",
+        "unit",
+        "unit_price",
+        "discount_amount",
+        "tax_rate",
+        "line_total"
+      ],
+      "properties": {
+        "line_number": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 1
+        },
+        "item_code": {
+          "$ref": "#/$defs/nullable_string"
+        },
+        "description": {
+          "$ref": "#/$defs/nullable_string"
+        },
+        "quantity": {
+          "$ref": "#/$defs/nullable_number",
+          "minimum": 0
+        },
+        "unit": {
+          "$ref": "#/$defs/nullable_string"
+        },
+        "unit_price": {
+          "$ref": "#/$defs/nullable_number",
+          "minimum": 0
+        },
+        "discount_amount": {
+          "$ref": "#/$defs/nullable_number",
+          "minimum": 0
+        },
+        "tax_rate": {
+          "$ref": "#/$defs/nullable_number",
+          "minimum": 0
+        },
+        "line_total": {
+          "$ref": "#/$defs/nullable_number",
+          "minimum": 0
+        }
+      }
+    },
+    "totals": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "subtotal",
+        "discount_total",
+        "tax_total",
+        "grand_total",
+        "currency"
+      ],
+      "properties": {
+        "subtotal": {
+          "$ref": "#/$defs/nullable_number",
+          "minimum": 0
+        },
+        "discount_total": {
+          "$ref": "#/$defs/nullable_number",
+          "minimum": 0
+        },
+        "tax_total": {
+          "$ref": "#/$defs/nullable_number",
+          "minimum": 0
+        },
+        "grand_total": {
+          "$ref": "#/$defs/nullable_number",
+          "minimum": 0
+        },
+        "currency": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_type",
+        "dataset_name",
+        "license_or_terms",
+        "image_path",
+        "split",
+        "base_document_id"
+      ],
+      "properties": {
+        "source_type": {
+          "type": "string",
+          "enum": [
+            "public",
+            "synthetic",
+            "user_provided"
+          ]
+        },
+        "dataset_name": {
+          "$ref": "#/$defs/nullable_string"
+        },
+        "license_or_terms": {
+          "$ref": "#/$defs/nullable_string"
+        },
+        "image_path": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Project-root-relative image path."
+        },
+        "split": {
+          "type": "string",
+          "enum": [
+            "train",
+            "validation",
+            "test",
+            "unassigned"
+          ]
+        },
+        "base_document_id": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "text_region": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "text",
+        "bbox"
+      ],
+      "properties": {
+        "text": {
+          "type": "string",
+          "minLength": 1
+        },
+        "bbox": {
+          "type": "array",
+          "minItems": 4,
+          "maxItems": 4,
+          "items": {
+            "type": "number",
+            "minimum": 0
+          },
+          "description": "[x, y, width, height] in pixels."
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,43 @@
+# Môi trường Python và tệp tạm
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.env
+.env.*
+!.env.example
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Không commit dữ liệu công khai được tải về; chỉ giữ manifest và hướng dẫn.
+data/raw/public/*
+!data/raw/public/README.md
+!data/raw/public/.gitkeep
+!data/raw/public/datasets_manifest.csv
+
+# Không commit tài liệu riêng tư do người dùng cung cấp.
+data/raw/user_provided/*
+!data/raw/user_provided/README.md
+
+# Kết quả sinh tự động không được commit. Giữ hướng dẫn trong từng thư mục.
+data/processed/*
+!data/processed/README.md
+!data/processed/.gitkeep
+!data/processed/preprocessed/
+data/processed/preprocessed/*
+!data/processed/preprocessed/README.md
+!data/processed/ocr/
+data/processed/ocr/*
+!data/processed/ocr/README.md
+!data/processed/visualizations/
+data/processed/visualizations/*
+!data/processed/visualizations/README.md
+
+# Không commit báo cáo và log được sinh tự động.
+reports/
+*.log
