@@ -20,7 +20,7 @@ def main() -> int:
     parser.add_argument("--mode", choices=PREPROCESSING_MODES, default="original", help="Chế độ tiền xử lý ảnh")
     parser.add_argument("--all-modes", action="store_true", help="Chạy lần lượt mọi chế độ để so sánh")
     parser.add_argument("--document-id", help="Mã tài liệu; tự dò từ JSONL mẫu nếu bỏ trống")
-    parser.add_argument("--language", default="vie+eng", help="Mã gói ngôn ngữ Tesseract, mặc định vie+eng")
+    parser.add_argument("--language", default="vie", help="Mã gói ngôn ngữ Tesseract, mặc định vie+eng")
     parser.add_argument("--psm", type=int, default=6, help="Tesseract Page Segmentation Mode, mặc định 6")
     parser.add_argument("--tesseract-path", help="Đường dẫn đến tesseract.exe nếu chưa cấu hình PATH")
     parser.add_argument("--output-dir", default=str(ROOT / "data/processed/ocr"), help="Thư mục lưu JSON/TXT")

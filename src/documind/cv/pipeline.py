@@ -13,7 +13,8 @@ from documind.cv.preprocessing import (
     PREPROCESSING_MODES,
     image_size,
     load_image,
-    preprocess_image,
+    map_bbox_to_original,
+    preprocess_with_info,
     save_image,
 )
 
@@ -64,7 +65,7 @@ def run_ocr(
     output_dir: str | Path,
     visualization_dir: str | Path,
     document_id: str | None = None,
-    language: str = "vie+eng",
+    language: str = "vie",
     page_segmentation_mode: int = 6,
     tesseract_path: str | Path | None = None,
     engine: TesseractOCR | None = None,
@@ -75,7 +76,7 @@ def run_ocr(
         raise ValueError(f"mode phải thuộc: {', '.join(PREPROCESSING_MODES)}")
     source = Path(image_path).expanduser().resolve()
     original = load_image(source)
-    prepared = preprocess_image(original, mode)
+    prepared, info = preprocess_with_info(original, mode)
     doc_id = resolve_document_id(source, document_id)
 
     output_root = Path(output_dir)
@@ -92,6 +93,13 @@ def run_ocr(
     elapsed = time.perf_counter() - started
     size = image_size(original)
 
+    angle = float(info.get("deskew_angle_degrees", 0.0))
+    if angle:
+        # OCR chạy trên ảnh đã xoay: giữ bbox gốc của OCR và đưa bbox chính về hệ ảnh gốc.
+        for line in lines:
+            line["bbox_processed"] = line["bbox"]
+            line["bbox"] = map_bbox_to_original(line["bbox"], angle, size)
+
     result: dict[str, Any] = {
         "result_version": "1.0",
         "document_id": doc_id,
@@ -101,6 +109,7 @@ def run_ocr(
         "ocr_language": language,
         "page_segmentation_mode": page_segmentation_mode,
         "preprocessing_mode": mode,
+        "deskew_angle_degrees": angle,
         "image_size": size,
         "elapsed_seconds": round(elapsed, 4),
         "line_count": len(lines),

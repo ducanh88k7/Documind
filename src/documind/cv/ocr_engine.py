@@ -40,7 +40,7 @@ class TesseractOCR:
     def recognize(
         self,
         image_path: str | Path,
-        language: str = "vie+eng",
+        language: str = "vie",
         page_segmentation_mode: int = 6,
     ) -> list[dict[str, Any]]:
         """Trả kết quả theo từng dòng gồm nội dung, confidence và bbox [x, y, w, h]."""
