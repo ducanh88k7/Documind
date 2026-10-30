@@ -38,7 +38,8 @@ data/processed/ocr/*
 data/processed/visualizations/*
 !data/processed/visualizations/README.md
 
-data/synthetic/*
+data/raw/synthetic/*
+!data/raw/synthetic/.gitkeep
 
 # Không commit báo cáo và log được sinh tự động.
 reports/
